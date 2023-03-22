@@ -1,5 +1,6 @@
 package code;
 
+import image.APImage;
 import image.Pixel;
 
 public class ImageManipulation {
@@ -8,8 +9,11 @@ public class ImageManipulation {
      *  Write a statement that will display the image in a window
      */
     public static void main(String[] args) {
-
-
+        APImage image = new APImage("cyberpunk2077.jpg");
+        // image.draw();
+        // grayScale("cyberpunk2077.jpg");
+        // blackAndWhite("cyberpunk2077.jpg");
+        edgeDetection("cyberpunk2077.jpg", 20);
     }
 
     /** CHALLENGE ONE: Grayscale
@@ -21,7 +25,20 @@ public class ImageManipulation {
      * Calculate the average of the red, green, and blue components of the pixel.
      * Set the red, green, and blue components to this average value. */
     public static void grayScale(String pathOfFile) {
-
+        APImage image = new APImage(pathOfFile);
+        int width = image.getWidth();
+        int height = image.getHeight();
+        for (int i = 0; i<width; i++){
+            for (int l = 0; l<height; l++){
+                Pixel pixel = image.getPixel(i,l);
+                int average = (pixel.getRed() + pixel.getBlue() + pixel.getGreen()) / 3;
+                pixel.setBlue(average);
+                pixel.setRed(average);
+                pixel.setGreen(average);
+                image.setPixel(i, l, pixel);
+            }
+        }
+        image.draw();
     }
 
     /** A helper method that can be used to assist you in each challenge.
@@ -43,7 +60,27 @@ public class ImageManipulation {
      * If the average is less than 128, set the pixel to black
      * If the average is equal to or greater than 128, set the pixel to white */
     public static void blackAndWhite(String pathOfFile) {
-
+        APImage image = new APImage(pathOfFile);
+        int width = image.getWidth();
+        int height = image.getHeight();
+        for (int i = 0; i<width; i++){
+            for (int l = 0; l<height; l++){
+                Pixel pixel = image.getPixel(i,l);
+                int average = (pixel.getRed() + pixel.getBlue() + pixel.getGreen()) / 3;
+                if (average<128){
+                    pixel.setBlue(0);
+                    pixel.setGreen(0);
+                    pixel.setRed(0);
+                }
+                else {
+                    pixel.setBlue(255);
+                    pixel.setGreen(255);
+                    pixel.setRed(255);
+                }
+                image.setPixel(i, l, pixel);
+            }
+        }
+        image.draw();
     }
 
     /** CHALLENGE Three: Edge Detection
@@ -69,7 +106,34 @@ public class ImageManipulation {
      * edge detection to an image using a threshold of 35
      *  */
     public static void edgeDetection(String pathToFile, int threshold) {
-
+        APImage image = new APImage(pathToFile);
+        APImage imageCopy = image.clone();
+        int width = image.getWidth();
+        int height = image.getHeight();
+        // you start at i = 1, l = 1
+        for (int i = 1; i<width; i++){
+            for (int l = 1; l<height; l++){
+                Pixel pixelCurrent = imageCopy.getPixel(i,l);
+                Pixel pixelLeft = imageCopy.getPixel(i-1,l);
+                Pixel pixelBelow = imageCopy.getPixel(i,l-1);
+                Pixel realPixelCurrent = image.getPixel(i, l);
+                int current = (pixelCurrent.getRed() + pixelCurrent.getBlue() + pixelCurrent.getGreen()) / 3;
+                int left = (pixelLeft.getRed() + pixelLeft.getBlue() + pixelLeft.getGreen()) / 3;
+                int below = (pixelBelow.getRed() + pixelBelow.getBlue() + pixelBelow.getGreen()) / 3;
+                if (current-left>threshold || left-current>threshold || current-below>threshold || below-left>threshold){
+                    realPixelCurrent.setBlue(0);
+                    realPixelCurrent.setRed(0);
+                    realPixelCurrent.setGreen(0);
+                }
+                else {
+                    realPixelCurrent.setBlue(255);
+                    realPixelCurrent.setRed(255);
+                    realPixelCurrent.setGreen(255);
+                }
+                image.setPixel(i, l, realPixelCurrent);
+            }
+        }
+        image.draw();
     }
 
     /** CHALLENGE Four: Reflect Image
